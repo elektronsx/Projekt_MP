@@ -16,19 +16,9 @@
 #include "dht11/dht.h"
 
 
-
+// notka dla MS
 #define EEMEM __attribute__((section(".eeprom")))
 
-const char PROGMEM tab1[] = {"FLASH"};
-char EEMEM tab2[] = {"EEPROM"};
-
-uint8_t znak_L[] = {16,16,18,20,24,16,31,0};		// wzór znaku litery £ w pamiêci RAM
-uint8_t znak_o[] EEMEM = {4,32,14,17,17,17,14,0};	// wzór znaku litery ó w pamiêci EEPROM
-const uint8_t znak_buzka[] PROGMEM = {14,17,27,17,17,21,17,14};	// wzór znaku buŸki w pamiêci FLASH
-const uint8_t znak_termo[] PROGMEM = {4,10,10,10,17,31,31,14};	// wzór znaku termometru w pamiêci FLASH
-
-
-//const char PROGMEM tab1[] = {"DZIALA"};
 
 int main(void)
 {
@@ -36,21 +26,15 @@ int main(void)
 	DDRC |= (1<<PC5);	// ustawiamy kierunek linii podœwietlenia LCD jako WYJŒCIE
 	
 	PORTC |= (1<<PC5);	// za³¹czamy podœwietlenie LCD - stan wysoki
-	_delay_ms(1000);
-
-	PORTC &= ~(1<<PC5);	// za³¹czamy podœwietlenie LCD - stan wysoki
-
-	_delay_ms(1000);
-	PORTC |= (1<<PC5);	// za³¹czamy podœwietlenie LCD - stan wysoki
 
 	
 	
 	
 
-	_delay_ms(1000);
+	_delay_ms(1000);		//inicjalizacja LCD
 	lcd_init();
 	
-	int8_t temperatura = 0;
+	int8_t temperatura = 0;		//zmienne dla dht
 	int8_t wilgotnosc = 0;
 	
 	
@@ -58,7 +42,7 @@ int main(void)
 	
 
 	while(1){
-		
+		// wywo³anie funkcji odczytu 
 		if(dht_gettemperaturehumidity(&temperatura, &wilgotnosc) != -1) {
 			
 			lcd_cls();
@@ -69,9 +53,15 @@ int main(void)
 			lcd_locate(1,0);
 			lcd_int(wilgotnosc);
 
+		}else{
+			
+			// jesli z czujnikiem bêdzie coœ nie tak, zwróci error
+			lcd_cls();
+			lcd_home();
+			lcd_str("ERROR CZUJNIKA");
 		}
 		
-		_delay_ms(1500);
+		_delay_ms(500);
 		
 		
 	}
